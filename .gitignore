@@ -1,6 +1,9 @@
 # General
 .DS_Store
 .netrc
+*.swp
+*.tmp
+*.log
 
 # Build outputs
 /.build
@@ -26,5 +29,9 @@ fastlane/test_output
 # Playgrounds
 timeline.xctimeline
 playground.xcworkspace
+
+# App bundles and zips
+Trimmy.app
+*.zip
 Trimmy-0.1.0.zip
 Trimmy.app
