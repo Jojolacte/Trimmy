@@ -284,7 +284,24 @@ struct MenuContentView: View {
 
     private func showAbout() {
         NSApp.activate(ignoringOtherApps: true)
-        NSApplication.shared.orderFrontStandardAboutPanel(nil)
+
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "–"
+        let credits = NSAttributedString(
+            string: "Peter Steinberger — MIT License\nhttps://github.com/steipete/Trimmy",
+            attributes: [
+                .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize),
+                .foregroundColor: NSColor.secondaryLabelColor,
+            ])
+
+        let options: [NSApplication.AboutPanelOptionKey: Any] = [
+            .applicationName: "Trimmy",
+            .applicationVersion: version,
+            .version: version,
+            .credits: credits,
+            .applicationIcon: (NSApplication.shared.applicationIconImage ?? NSImage()) as Any,
+        ]
+
+        NSApplication.shared.orderFrontStandardAboutPanel(options: options)
     }
 }
 
