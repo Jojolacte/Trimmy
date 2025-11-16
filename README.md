@@ -25,8 +25,8 @@ Get the precompiled binary from [Releases](https://github.com/steipete/Trimmy/re
 ![Trimmy UI](trimmy-ui.png)
 
 ## Lint / Format
-- Format: `swiftformat .` (config `.swiftformat` from Peekaboo defaults).
-- Lint: `swiftlint lint --fix` or `swiftlint lint` (config `.swiftlint.yml` from Peekaboo defaults).
+- Format: `swiftformat`.
+- Lint: `swiftlint lint --fix` or `swiftlint lint`.
 
 ## Notes
 - Bundle ID: `com.steipete.trimmy` (LSUIElement menu-bar app).
