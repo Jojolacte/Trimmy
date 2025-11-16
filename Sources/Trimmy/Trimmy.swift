@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import ServiceManagement
 import SwiftUI
 
 // MARK: - Settings
@@ -17,14 +18,24 @@ enum Aggressiveness: String, CaseIterable, Identifiable, Codable {
     }
 }
 
+@MainActor
 final class AppSettings: ObservableObject {
     @AppStorage("aggressiveness") var aggressiveness: Aggressiveness = .normal
     @AppStorage("preserveBlankLines") var preserveBlankLines: Bool = false
     @AppStorage("autoTrimEnabled") var autoTrimEnabled: Bool = true
+    @AppStorage("launchAtLogin") var launchAtLogin: Bool = false {
+        didSet { LaunchAtLoginManager.setEnabled(self.launchAtLogin) }
+    }
+
+    init() {
+        // Apply stored launch preference at startup.
+        LaunchAtLoginManager.setEnabled(self.launchAtLogin)
+    }
 }
 
 // MARK: - Command Detection
 
+@MainActor
 struct CommandDetector {
     let settings: AppSettings
 
@@ -260,11 +271,12 @@ struct MenuContentView: View {
                 Text("Aggressiveness: \(self.settings.aggressiveness.titleShort)")
             }
             Toggle("Keep blank lines", isOn: self.$settings.preserveBlankLines)
+            Toggle("Launch at login", isOn: self.$settings.launchAtLogin)
             Button("Trim Clipboard Now") {
                 self.monitor.trimClipboardIfNeeded(force: true)
             }
             Button("About Trimmy") {
-                showAbout()
+                self.showAbout()
             }
             Text(self.settingsSummary)
                 .foregroundStyle(.secondary)
@@ -308,6 +320,7 @@ struct MenuContentView: View {
 // MARK: - App
 
 @main
+@MainActor
 struct TrimmyApp: App {
     @StateObject private var settings = AppSettings()
     @StateObject private var monitor: ClipboardMonitor
@@ -334,5 +347,18 @@ struct TrimmyApp: App {
     @MainActor
     func applicationDidFinishLaunching(_ notification: Notification) {
         self.monitor.start()
+    }
+}
+
+enum LaunchAtLoginManager {
+    @MainActor
+    static func setEnabled(_ enabled: Bool) {
+        guard #available(macOS 13, *) else { return }
+        let service = SMAppService.mainApp
+        if enabled {
+            try? service.register()
+        } else {
+            try? service.unregister()
+        }
     }
 }

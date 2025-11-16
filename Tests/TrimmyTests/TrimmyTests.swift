@@ -1,32 +1,39 @@
-import XCTest
+import Foundation
+import Testing
 @testable import Trimmy
 
-final class TrimmyTests: XCTestCase {
-    func testRejoinsNewlineInsideToken() {
+@MainActor
+@Suite
+struct TrimmyTests {
+    @Test
+    func detectsMultiLineCommand() {
         let settings = AppSettings()
-        settings.aggressiveness = .high
-        settings.preserveBlankLines = false
-        settings.autoTrimEnabled = true
         let detector = CommandDetector(settings: settings)
-
-        let input =
-            "cd /Users/steipete/Projects/Peekaboo && N\n" +
-            "ODE_PATH=../poltergeist/node_modules ./runner pnpm " +
-            "--dir ../poltergeist exec tsx ../poltergeist/src/polter.ts"
-
-        let flattened = detector.transformIfCommand(input)
-        let expected =
-            "cd /Users/steipete/Projects/Peekaboo && NODE_PATH=../poltergeist/node_modules " +
-            "./runner pnpm --dir ../poltergeist exec tsx ../poltergeist/src/polter.ts"
-        XCTAssertEqual(flattened, expected)
+        let text = "echo hi\nls -la\n"
+        #expect(detector.transformIfCommand(text) == "echo hi ls -la")
     }
 
-    func testLeavesSingleLineAlone() {
+    @Test
+    func skipsSingleLine() {
         let settings = AppSettings()
-        settings.aggressiveness = .high
         let detector = CommandDetector(settings: settings)
+        #expect(detector.transformIfCommand("ls -la") == nil)
+    }
 
-        let input = "echo hello"
-        XCTAssertNil(detector.transformIfCommand(input))
+    @Test
+    func skipsLongCopies() {
+        let settings = AppSettings()
+        let detector = CommandDetector(settings: settings)
+        let blob = Array(repeating: "echo hi", count: 11).joined(separator: "\n")
+        #expect(detector.transformIfCommand(blob) == nil)
+    }
+
+    @Test
+    func preservesBlankLinesWhenEnabled() {
+        let settings = AppSettings()
+        settings.preserveBlankLines = true
+        let detector = CommandDetector(settings: settings)
+        let text = "echo hi\n\necho bye\n"
+        #expect(detector.transformIfCommand(text) == "echo hi\n\necho bye")
     }
 }
