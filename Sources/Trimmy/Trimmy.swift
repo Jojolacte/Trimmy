@@ -61,6 +61,10 @@ struct CommandDetector {
         if settings.preserveBlankLines {
             result = result.replacingOccurrences(of: "\n\\s*\n", with: placeholder, options: .regularExpression)
         }
+        // Repair cases where a newline sneaks into a token (e.g., "N\nODE_PATH").
+        result = result.replacingOccurrences(of: #"([A-Za-z0-9_.-])\s*\n\s*([A-Za-z0-9_.-])"#,
+                                             with: "$1$2",
+                                             options: .regularExpression)
         // Remove line-continuation backslashes plus newline.
         result = result.replacingOccurrences(of: #"\\\s*\n"#, with: " ", options: .regularExpression)
         // Replace remaining newlines with single spaces.
