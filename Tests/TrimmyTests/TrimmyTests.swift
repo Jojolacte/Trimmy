@@ -237,4 +237,19 @@ struct TrimmyTests {
         // Single-line input should not be flattened; ensure it remains untouched.
         #expect(detector.transformIfCommand(text) == nil)
     }
+
+    @Test
+    func summaryEllipsizesLongPreview() {
+        let long = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        // limit 20 -> head 9, tail 10, plus ellipsis
+        let truncated = ClipboardMonitor.ellipsize(long, limit: 20)
+        #expect(truncated == "012345678…QRSTUVWXYZ")
+        #expect(truncated.count == 20)
+    }
+
+    @Test
+    func summaryDoesNotEllipsizeShortPreview() {
+        let text = "short preview"
+        #expect(ClipboardMonitor.ellipsize(text, limit: 90) == text)
+    }
 }

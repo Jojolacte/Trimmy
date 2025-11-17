@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Last trim preview now middle-truncates long text so the menu stays compact while showing both start and end of the command.
+
 ## 0.2.3 — 2025-11-17
 - Optional stripping of box-drawing separators (│ │) with whitespace collapse so prompt-style borders paste cleanly.
 - Thanks to @Blueemi for contributing the box-drawing cleaning option.

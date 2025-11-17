@@ -92,6 +92,17 @@ final class ClipboardMonitor: ObservableObject {
     }
 
     private func updateSummary(with text: String) {
-        self.lastSummary = text.replacingOccurrences(of: "\n", with: " ")
+        let singleLine = text.replacingOccurrences(of: "\n", with: " ")
+        self.lastSummary = ClipboardMonitor.ellipsize(singleLine, limit: 90)
+    }
+
+    static func ellipsize(_ text: String, limit: Int) -> String {
+        guard limit >= 3, text.count > limit else { return text }
+        let keep = limit - 1 // account for ellipsis
+        let headCount = keep / 2
+        let tailCount = keep - headCount
+        let head = text.prefix(headCount)
+        let tail = text.suffix(tailCount)
+        return "\(head)…\(tail)"
     }
 }
