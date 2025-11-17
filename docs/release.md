@@ -56,6 +56,8 @@ git tag v0.2.2
 - [ ] `./Scripts/sign-and-notarize.sh`
 - [ ] Generate Sparkle appcast with private key
 - [ ] Upload zip + appcast to feed, publish release/tag
+- [ ] Verify the release asset: download the uploaded `Trimmy-<ver>.zip`, unzip, run, and confirm code signature stubs in place (spctl + launch).
+- [ ] Confirm `appcast.xml` is updated to the new version and points to the uploaded zip (no stale version/URL).
 - [ ] When creating the GitHub release, paste the CHANGELOG entry as a proper Markdown list (one `-` per line, blank line between sections); verify the rendered release notes aren’t collapsed into a single line.
 
 ## Troubleshooting
