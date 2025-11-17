@@ -3,6 +3,8 @@
 ## 0.2.3 — 2025-11-17
 - Optional stripping of box-drawing separators (│ │) with whitespace collapse so prompt-style borders paste cleanly.
 - Thanks to @Blueemi for contributing the box-drawing cleaning option.
+- Quit item restored in the menu bar root (consistent with CodexBar layout).
+- Release notes/process cleanup (archive/signing steps clarified).
 
 ## 0.2.2 — 2025-11-16
 - About panel now lists GitHub · Website · Twitter · Email links inline (matches CodexBar).
