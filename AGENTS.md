@@ -99,3 +99,6 @@ Edit guidance: keep the actual tool list inside this `<tools></tools>` block so 
 - `XcodeBuildMCP`: MCP wrapper around Xcode tooling; run `npx mcporter XcodeBuildMCP`.
 - `gh`: GitHub CLI for PRs, CI logs, releases, repo queries; run `gh help`.
 </tools>
+
+# Repo-local notes
+- After making changes, always rebuild, run tests, and relaunch the app (`swift build -q`, `swift test -q`, `open Trimmy.app`) so it’s ready for manual verification.
