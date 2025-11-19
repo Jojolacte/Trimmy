@@ -14,6 +14,11 @@ struct MenuContentView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            Toggle(isOn: self.$settings.autoTrimEnabled) {
+                Text("Auto-Trim")
+            }
+            .toggleStyle(.checkbox)
+
             Button("Trim Clipboard") {
                 self.handleTrimClipboard()
             }
