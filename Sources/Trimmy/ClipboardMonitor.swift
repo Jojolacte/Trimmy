@@ -66,6 +66,11 @@ final class ClipboardMonitor: ObservableObject {
         return self.pasteboard.string(forType: .string)
     }
 
+    /// Exposes the current clipboard string (nil if empty or Trimmy marker).
+    func clipboardText() -> String? {
+        self.readTextFromPasteboard()
+    }
+
     private func writeTrimmed(_ text: String) {
         self.pasteboard.declareTypes([.string, self.trimmyMarker], owner: nil)
         self.pasteboard.setString(text, forType: .string)

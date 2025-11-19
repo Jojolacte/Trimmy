@@ -12,6 +12,7 @@ final class HotkeyManager: ObservableObject {
     private let monitor: ClipboardMonitor
     private let sender = KeySender()
     private var handlerRegistered = false
+    private var failureAlertShown = false
 
     init(settings: AppSettings, monitor: ClipboardMonitor) {
         self.settings = settings
@@ -56,20 +57,60 @@ final class HotkeyManager: ObservableObject {
 
     @discardableResult
     private func handleHotkey() -> Bool {
-        guard let trimmed = self.monitor.trimmedClipboardText(force: true) else {
-            Telemetry.hotkey.notice("No trimmable clipboard text (force=true). Clipboard likely single-line or empty.")
-            NSSound.beep()
-            return false
-        }
-
         guard KeySender.ensureAccessibility() else {
             Telemetry.accessibility
                 .error(
                     "Accessibility not trusted; prompt should have been shown. bundle=\(Bundle.main.bundleIdentifier ?? "nil", privacy: .public) exec=\(Bundle.main.executableURL?.path ?? "nil", privacy: .public)")
             NSSound.beep()
+            self.presentAccessibilityHelp()
             return false
         }
 
-        return self.sender.type(text: trimmed)
+        guard let rawClipboard = self.monitor.clipboardText() else {
+            Telemetry.hotkey.notice("Clipboard empty or unavailable.")
+            NSSound.beep()
+            return false
+        }
+
+        let lineCount = rawClipboard.split(whereSeparator: { $0.isNewline }).count
+        if lineCount > 20 {
+            let proceed = self.confirmLargePaste(lineCount: lineCount)
+            if !proceed { return false }
+        }
+
+        let textToType = self.monitor.trimmedClipboardText(force: true) ?? rawClipboard
+        return self.sender.type(text: textToType)
+    }
+
+    private func confirmLargePaste(lineCount: Int) -> Bool {
+        let alert = NSAlert()
+        alert.messageText = "Type \(lineCount) lines?"
+        alert.informativeText = "You’re about to type \(lineCount) lines. Continue?"
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Type All")
+        alert.addButton(withTitle: "Cancel")
+        NSApp.activate(ignoringOtherApps: true)
+        return alert.runModal() == .alertFirstButtonReturn
+    }
+
+    private func presentAccessibilityHelp() {
+        guard !self.failureAlertShown else { return }
+        self.failureAlertShown = true
+        let alert = NSAlert()
+        alert.messageText = "Allow Trimmy in Accessibility"
+        alert.informativeText = """
+        Trimmy needs Accessibility/Input Monitoring permission to type on your behalf.
+        Open System Settings → Privacy & Security → Accessibility, add Trimmy, and enable it. Then retry the hotkey.
+        """
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Open Settings")
+        alert.addButton(withTitle: "OK")
+        NSApp.activate(ignoringOtherApps: true)
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn,
+           let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
+        {
+            NSWorkspace.shared.open(url)
+        }
     }
 }
