@@ -22,6 +22,7 @@ struct MenuContentView: View {
             Button("Trim Clipboard") {
                 self.handleTrimClipboard()
             }
+            .keyboardShortcut("t", modifiers: [.command])
             self.typeClipboardButton
             VStack(alignment: .leading, spacing: 2) {
                 Text("Last:")
