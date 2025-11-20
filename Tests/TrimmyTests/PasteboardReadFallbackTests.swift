@@ -3,16 +3,16 @@ import Testing
 @testable import Trimmy
 
 @MainActor
-@Suite
+@Suite(.serialized)
 struct PasteboardReadFallbackTests {
     @Test
     func readsStringWhenOnlyPublicTextAvailable() {
         let settings = AppSettings()
-        let monitor = ClipboardMonitor(settings: settings)
-        NSPasteboard.general.clearContents()
+        let pasteboard = makeTestPasteboard()
+        let monitor = ClipboardMonitor(settings: settings, pasteboard: pasteboard)
         let item = NSPasteboardItem()
         item.setString("hello from rtf", forType: NSPasteboard.PasteboardType("public.text"))
-        NSPasteboard.general.writeObjects([item])
+        pasteboard.writeObjects([item])
         #expect(monitor.clipboardText() == "hello from rtf")
     }
 }

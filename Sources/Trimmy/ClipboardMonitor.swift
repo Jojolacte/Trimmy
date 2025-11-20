@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 final class ClipboardMonitor: ObservableObject {
     private let settings: AppSettings
-    private let pasteboard = NSPasteboard.general
+    private let pasteboard: NSPasteboard
     private let trimmyMarker = NSPasteboard.PasteboardType("com.steipete.trimmy")
     private var timer: DispatchSourceTimer?
     private var lastSeenChangeCount: Int
@@ -15,8 +15,9 @@ final class ClipboardMonitor: ObservableObject {
 
     @Published var lastSummary: String = ""
 
-    init(settings: AppSettings) {
+    init(settings: AppSettings, pasteboard: NSPasteboard = NSPasteboard.general) {
         self.settings = settings
+        self.pasteboard = pasteboard
         self.lastSeenChangeCount = self.pasteboard.changeCount
     }
 
@@ -75,7 +76,7 @@ final class ClipboardMonitor: ObservableObject {
         if !ignoreMarker, self.pasteboard.types?.contains(self.trimmyMarker) == true { return nil }
 
         if let direct = self.pasteboard.string(forType: .string) {
-            return direct
+            return self.normalizeLineEndings(direct)
         }
 
         // Fall back to scanning pasteboard items for any text-like representation.
@@ -89,7 +90,7 @@ final class ClipboardMonitor: ObservableObject {
         for item in self.pasteboard.pasteboardItems ?? [] {
             for type in preferredTypes {
                 if let value = item.string(forType: type) {
-                    return value
+                    return self.normalizeLineEndings(value)
                 }
             }
         }
@@ -150,5 +151,11 @@ final class ClipboardMonitor: ObservableObject {
         let head = text.prefix(headCount)
         let tail = text.suffix(tailCount)
         return "\(head)…\(tail)"
+    }
+
+    private func normalizeLineEndings(_ text: String) -> String {
+        text
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
     }
 }
