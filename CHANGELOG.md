@@ -1,17 +1,17 @@
 # Changelog
 
 ## 0.3.0 — Unreleased
-- Trimmy now runs as a single instance to avoid double clipboard watchers or duplicate menu bar icons.
-- Global “Trim Clipboard” shortcut ships with a default of ⌥⌘T; you can change or disable it in Settings → Shortcuts and it shows in the menu.
-- Sparkle updater now auto-disables for unsigned/dev runs (mirrors CodexBar) to avoid updater error dialogs during development.
-- Debug builds now use bundle ID `com.steipete.trimmy.debug` and ship with Sparkle feed disabled, so Accessibility/Input Monitoring and updater prompts stay isolated from release builds.
 - Preferences got the full SwiftUI treatment: toolbar tabs (General, Aggressiveness, Shortcuts, About), window auto-resizing per tab, and richer About content with dimmed update controls for debug builds.
+- Shortcuts pane focuses on the Trim Clipboard hotkey (with glyphs) and lets you toggle or rebind it.
+- Global “Trim Clipboard” shortcut ships with a default of ⌥⌘T; you can change or disable it in Settings → Shortcuts and it shows in the menu.
 - Menu bar entry mirrors the new Settings window—actions for Trim Clipboard, Settings…, About Trimmy, plus a multi-line “Last” preview instead of the old submenu.
-- Aggressiveness previews now ship with a more illustrative “Low” example and unit tests that lock behavior for all three levels.
 - Menu bar icon dims automatically when Auto-Trim is disabled so it’s obvious the service is paused.
+- Trimmy now runs as a single instance to avoid double clipboard watchers or duplicate menu bar icons.
+- Sparkle updater now auto-disables for unsigned/dev runs to avoid updater error dialogs during development.
+- Debug builds now use bundle ID `com.steipete.trimmy.debug` and ship with Sparkle feed disabled, so Accessibility/Input Monitoring and updater prompts stay isolated from release builds.
+- Aggressiveness previews now ship with a more illustrative “Low” example and unit tests that lock behavior for all three levels.
 - Manual “Trim Clipboard” and its global shortcut now always run at High aggressiveness, while auto-trim honors the configured level.
 - New toggle (off by default) lets you enable extra clipboard fallbacks (RTF/public text types) for apps that don’t expose plain UTF-8 content.
-- Shortcuts pane focuses on the Trim Clipboard hotkey (with glyphs) and lets you toggle or rebind it.
 - Clipboard flattening now stitches path segments split across lines (e.g. `~/.ssh/\ngithub_rsa.pub`) without inserting stray spaces; applies to auto-trim (your set aggressiveness), manual trim (High), and the Aggressiveness preview examples.
 
 ## 0.2.4 — 2025-11-17
