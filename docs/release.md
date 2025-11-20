@@ -6,7 +6,7 @@ SwiftPM only; manual package/sign/notarize. Sparkle feed served from GitHub Rele
 - Xcode 26+ installed at `/Applications/Xcode.app` (for ictool/iconutil and SDKs).
 - Developer ID Application cert installed: `Developer ID Application: Peter Steinberger (Y5PE65HELJ)`.
 - ASC API creds in env: `APP_STORE_CONNECT_API_KEY_P8`, `APP_STORE_CONNECT_KEY_ID`, `APP_STORE_CONNECT_ISSUER_ID`.
-- Sparkle keys: public key already in Info.plist; private key path set via `SPARKLE_PRIVATE_KEY_FILE` when generating appcast.
+- Sparkle keys: public key already in Info.plist; private key lives at `/Users/steipete/Library/CloudStorage/Dropbox/Backup/Sparkle` and its path is passed via `SPARKLE_PRIVATE_KEY_FILE` when generating the appcast.
 
 ## Icon
 If the .icon changes:
