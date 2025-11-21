@@ -24,7 +24,7 @@ struct GeneralSettingsPane: View {
 
             PreferenceToggleRow(
                 title: "Use extra clipboard fallbacks",
-                subtitle: "Try RTF and public text types when plain text is missing (helps apps that don’t expose UTF-8).",
+                subtitle: "Try RTF and public text types when plain text is missing.",
                 binding: self.$settings.usePasteboardFallbacks)
 
             #if DEBUG

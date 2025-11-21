@@ -64,7 +64,7 @@ enum SettingsTab: String, Hashable, CaseIterable, Codable {
     case debug
     #endif
 
-    static let windowWidth: CGFloat = 440
+    static let windowWidth: CGFloat = 410
     static let windowHeight: CGFloat = 400
 }
 
