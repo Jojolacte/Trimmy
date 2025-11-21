@@ -376,16 +376,16 @@ extension ClipboardMonitor {
 
         return AttributedString(base)
     }
+
+    private func registerTrimEvent() {
+        self.trimPulseID &+= 1
+    }
 }
 
 #if DEBUG
 extension ClipboardMonitor {
     func triggerTrimPulse() {
         self.registerTrimEvent()
-    }
-
-    private func registerTrimEvent() {
-        self.trimPulseID &+= 1
     }
 
     func debugSetPreview(original: String, trimmed: String) {

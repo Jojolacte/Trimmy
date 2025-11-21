@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- (no changes yet)
+
+## 0.4.0 — 2025-11-21
 - Added “Paste Trimmed” action + global hotkey that trims on-the-fly (High aggressiveness), pastes, and restores your clipboard.
 - Added “Paste Original” action + hotkey so you can paste the untouched copy even after auto-trim; Trimmy now keeps the untrimmed text around for that path.
 - Paste actions now show the destination app (e.g., “Paste Trimmed to Ghostty”) so you know where the keystroke will land.
