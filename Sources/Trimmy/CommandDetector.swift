@@ -176,7 +176,8 @@ struct CommandDetector {
     private func isLikelySourceCode(_ text: String) -> Bool {
         let hasBraces = text.contains("{") || text.contains("}") || text.lowercased().contains("begin")
         let keywordPattern =
-            #"(?m)^\s*(import|package|namespace|using|template|class|struct|enum|extension|protocol|interface|func|def|fn|let|var|public|private|internal|open|protected|if|for|while)\b"#
+            #"(?m)^\s*(import|package|namespace|using|template|class|struct|enum|extension|protocol|"#
+                + #"interface|func|def|fn|let|var|public|private|internal|open|protected|if|for|while)\b"#
         let hasKeywords = text.range(of: keywordPattern, options: .regularExpression) != nil
         return hasBraces && hasKeywords
     }
