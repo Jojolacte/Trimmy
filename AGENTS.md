@@ -15,6 +15,7 @@ YOU MUST READ ~/Projects/agent-scripts/AGENTS.MD BEFORE ANYTHING (skip if file m
 - `./Scripts/sign-and-notarize.sh` — ship-ready signing + notarization.
 - `swift test [--filter …]` — executes Swift Testing/XCTest suite.
 - `swiftformat .` then `swiftlint lint --fix` (or `swiftlint lint`) — enforce formatting and linting.
+- After any code change, run `pnpm check` and fix all reported format/lint issues before handoff.
 
 ## Coding Style & Naming Conventions
 - SwiftFormat config: 4-space indent, LF, max width 120, before-first wrapping for args/params, explicit `self` inserted for concurrency correctness.
