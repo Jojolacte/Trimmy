@@ -58,7 +58,14 @@ struct AboutPane: View {
                     .foregroundStyle(.secondary)
                 if let buildTimestamp {
                     let git = Bundle.main.object(forInfoDictionaryKey: "TrimmyGitCommit") as? String
-                    let suffix = (git?.isEmpty == false && git != "unknown") ? " (\(git!))" : ""
+                    var suffix = ""
+                    if let git, !git.isEmpty, git != "unknown" {
+                        suffix = " (\(git)"
+                        #if DEBUG
+                        suffix += " DEBUG BUILD"
+                        #endif
+                        suffix += ")"
+                    }
                     Text("Built \(buildTimestamp)\(suffix)")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
