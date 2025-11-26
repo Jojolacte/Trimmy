@@ -1,7 +1,8 @@
 # Changelog
 
 ## 0.4.3 — Unreleased
-- Pending changes.
+- Clipboard flattening now rejoins hyphen-wrapped tokens (e.g., `...-9bd2-\nf1a4...png`) without inserting spaces, fixing QR/path copies from chats.
+- Guarded against treating markdown bullet lists as hyphen continuations so list snippets don’t get glued together when flattened.
 
 ## 0.4.2 — 2025-11-25
 - Menu “Paste Trimmed” and “Paste Original” previews now share the same 50-character middle ellipsis and badge stats for consistent clipping.

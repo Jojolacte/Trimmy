@@ -65,6 +65,31 @@ struct TrimmyTests {
     }
 
     @Test
+    func joinsHyphenWrappedSegments() {
+        let settings = AppSettings()
+        settings.aggressiveness = .normal
+        let detector = CommandDetector(settings: settings)
+        let text = """
+        open src/statics/qrcode/scan-qr-f1cc4328-eb1d-4a3c-9bd2-
+          f1a4ccda5f6a.png
+        """
+        #expect(detector
+            .transformIfCommand(text) == "open src/statics/qrcode/scan-qr-f1cc4328-eb1d-4a3c-9bd2-f1a4ccda5f6a.png")
+    }
+
+    @Test
+    func doesNotMergeListBullets() {
+        let settings = AppSettings()
+        settings.aggressiveness = .high
+        let detector = CommandDetector(settings: settings)
+        let text = """
+        - item one
+        - item two
+        """
+        #expect(detector.transformIfCommand(text) == "- item one - item two")
+    }
+
+    @Test
     func repairWrappedURLStripsInternalWhitespace() {
         let settings = AppSettings()
         let detector = CommandDetector(settings: settings)

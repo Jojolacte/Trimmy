@@ -211,6 +211,10 @@ struct CommandDetector {
             result = result.replacingOccurrences(of: "\n\\s*\n", with: placeholder, options: .regularExpression)
         }
         result = result.replacingOccurrences(
+            of: #"(?<=[A-Za-z0-9._~-])-\s*\n\s*([A-Za-z0-9._~-])"#,
+            with: "-$1",
+            options: .regularExpression)
+        result = result.replacingOccurrences(
             of: #"(?<!\n)([A-Z0-9_.-])\s*\n\s*([A-Z0-9_.-])(?!\n)"#,
             with: "$1$2",
             options: .regularExpression)
