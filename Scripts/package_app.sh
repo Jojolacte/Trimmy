@@ -62,6 +62,19 @@ PLIST
 
 cp ".build/$CONF/Trimmy" "$APP/Contents/MacOS/Trimmy"
 chmod +x "$APP/Contents/MacOS/Trimmy"
+
+# SwiftPM resource bundles (e.g. KeyboardShortcuts) need to be copied into the app bundle
+shopt -s nullglob
+for bundle in ".build/$CONF/"*.bundle; do
+  cp -R "$bundle" "$APP/Contents/Resources/"
+done
+shopt -u nullglob
+# Require at least one SwiftPM resource bundle (KeyboardShortcuts) so packaging fails if resources are lost.
+if ! ls "$APP/Contents/Resources/"*.bundle >/dev/null 2>&1; then
+  echo "ERROR: No SwiftPM resource bundles copied into $APP/Contents/Resources (expected KeyboardShortcuts bundle)." >&2
+  exit 1
+fi
+
 # Embed Sparkle.framework
 if [[ -d ".build/$CONF/Sparkle.framework" ]]; then
   cp -R ".build/$CONF/Sparkle.framework" "$APP/Contents/Frameworks/"
@@ -86,6 +99,9 @@ fi
 if [[ -f "$ICON_TARGET" ]]; then
   cp "$ICON_TARGET" "$APP/Contents/Resources/Icon.icns"
 fi
+
+# Ensure contents are writable before stripping attributes and signing
+chmod -R u+w "$APP"
 
 # Strip extended attributes to avoid AppleDouble (._*) files that break code sealing
 xattr -cr "$APP"

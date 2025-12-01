@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.4.4 — Unreleased
-- Pending changes.
+- Fixed a crash when opening Settings → Shortcuts by ensuring the KeyboardShortcuts resource bundle is packaged into Trimmy.app; packaging now fails if SwiftPM bundles are missing and a regression test guards bundle availability.
 
 ## 0.4.3 — 2025-11-26
 - Clipboard flattening now rejoins hyphen-wrapped tokens (e.g., `...-9bd2-\nf1a4...png`) without inserting spaces, fixing QR/path copies from chats.
