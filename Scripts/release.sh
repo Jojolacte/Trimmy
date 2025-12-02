@@ -104,6 +104,24 @@ repl(pathlib.Path("Scripts/package_app.sh"),
 repl(pathlib.Path("Scripts/sign-and-notarize.sh"),
      r'^(ZIP_NAME=)"Trimmy-[^"]+\.zip"$',
      rf'\g<1>"Trimmy-{ver}.zip"')
+repl(pathlib.Path("version.env"),
+     r'^(MARKETING_VERSION=).*$',
+     rf'\g<1>{ver}')
+repl(pathlib.Path("version.env"),
+     r'^(BUILD_NUMBER=).*$',
+     rf'\g<1>{build}')
+repl(pathlib.Path("Info.plist"),
+     r'(CFBundleShortVersionString</key>\s*<string>)([^<]+)',
+     rf'\g<1>{ver}')
+repl(pathlib.Path("Info.plist"),
+     r'(CFBundleVersion</key>\s*<string>)([^<]+)',
+     rf'\g<1>{build}')
+repl(pathlib.Path("Info.debug.plist"),
+     r'(CFBundleShortVersionString</key>\s*<string>)([^<]+)',
+     rf'\g<1>{ver}')
+repl(pathlib.Path("Info.debug.plist"),
+     r'(CFBundleVersion</key>\s*<string>)([^<]+)',
+     rf'\g<1>{build}')
 PY
 }
 
@@ -206,7 +224,7 @@ PY
 verify_local_artifacts() {
   LOG "Verifying local artifacts in parallel"
   (
-    sign_update --verify "$ZIP_NAME" "$SIGNATURE" >/dev/null && LOG "Signature verify ok"
+    sign_update --verify --ed-key-file "$SPARKLE_PRIVATE_KEY_FILE" "$ZIP_NAME" "$SIGNATURE" >/dev/null && LOG "Signature verify ok"
   ) &
   p1=$!
   (
@@ -241,7 +259,8 @@ verify_remote_assets() {
 
 create_tag_and_release() {
   LOG "Creating tag v$VERSION"
-  git add CHANGELOG.md Scripts/package_app.sh Scripts/sign-and-notarize.sh appcast.xml
+  git add CHANGELOG.md Scripts/package_app.sh Scripts/sign-and-notarize.sh appcast.xml \
+    version.env Info.plist Info.debug.plist
   git commit -m "Release $VERSION (build $BUILD)"
   git tag "v$VERSION"
   LOG "Pushing main and tag"
