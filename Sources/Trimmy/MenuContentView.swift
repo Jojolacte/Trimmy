@@ -115,7 +115,7 @@ extension MenuContentView {
                 self.handlePasteOriginal()
             }
             .applyKeyboardShortcut(self.pasteOriginalKeyboardShortcut)
-            Text(self.monitor.struckOriginalPreview(limit: 50))
+            Text(self.monitor.struckOriginalPreview(limit: MenuPreview.limit))
                 .font(.caption2).monospaced()
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
@@ -138,7 +138,7 @@ extension MenuContentView {
     }
 
     private var trimmedPreviewLine: String {
-        ClipboardMonitor.ellipsize(self.monitor.trimmedPreviewText(), limit: 50)
+        ClipboardMonitor.ellipsize(self.monitor.trimmedPreviewText(), limit: MenuPreview.limit)
     }
 
     private var trimmedStatsSuffix: String {
@@ -154,7 +154,7 @@ extension MenuContentView {
         guard let text else { return "" }
         return PreviewMetrics.prettyBadge(
             count: text.count,
-            limit: 50,
+            limit: MenuPreview.limit,
             showTruncations: showTruncations)
     }
 }
@@ -168,6 +168,10 @@ extension View {
             self
         }
     }
+}
+
+private enum MenuPreview {
+    static let limit = 100
 }
 
 extension KeyboardShortcuts.Shortcut {
