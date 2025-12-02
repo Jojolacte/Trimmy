@@ -14,6 +14,13 @@ SwiftPM only; manual package/sign/notarize. Sparkle feed served from GitHub Rele
 ## Expectations
 - When asked to “release” a version, execute the full, end-to-end flow: bump versions/CHANGELOG, build, sign & notarize, upload the zip to the GitHub release, generate/update the appcast with the new signature, publish the release/tag, and verify the enclosure downloads successfully via HTTP (no 404s) and installs.
 
+### Release automation notes (Scripts/release.sh)
+- Always forces a fresh rebuild/notarization (no cached artifacts) to avoid stale Swift outputs.
+- Fails fast if: working tree is dirty, changelog top section is still “Unreleased”, target version already exists in appcast, or build number is not greater than the latest appcast build.
+- Extracts release notes directly from the current changelog section and uses them for the GitHub release (no manual notes flag needed).
+- Preflight Sparkle key sanity check; verifies signature, spctl, and codesign locally, and HEAD checks remote zip/dSYM; runs `Scripts/check-release-assets.sh v<ver>` after upload.
+- Requires `python3`, `sign_update`, `swiftlint`, `swift`, `gh`, `zip`, `curl` in PATH plus `APP_STORE_CONNECT_*` and `SPARKLE_PRIVATE_KEY_FILE` env vars.
+
 ## Prereqs
 - Xcode 26+ installed at `/Applications/Xcode.app` (for ictool/iconutil and SDKs).
 - Developer ID Application cert installed: `Developer ID Application: Peter Steinberger (Y5PE65HELJ)`.
@@ -65,7 +72,7 @@ git tag v0.2.2
 
 ## Checklist (quick)
 - [ ] Read both this file and `~/Projects/agent-scripts/docs/RELEASING-MAC.md`; resolve any conflicts toward Trimmy’s specifics.
-- [ ] Update versions (Package scripts, About text, CHANGELOG)
+- [ ] Update versions (Package scripts, About text, CHANGELOG) — `Scripts/release.sh` now pulls release notes from the top changelog section automatically, so finalize it first.
 - [ ] `swiftformat`, `swiftlint`, `swift test` (ensure zero warnings/errors)
 - [ ] `./Scripts/build_icon.sh` if icon changed
 - [ ] `./Scripts/sign-and-notarize.sh`

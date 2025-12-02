@@ -24,6 +24,7 @@ fi
 
 ZIP_NAME="Trimmy-${VERSION}.zip"
 DSYM_ZIP="Trimmy-${VERSION}.dSYM.zip"
+APP_BUNDLE="Trimmy.app"
 
 require() {
   command -v "$1" >/dev/null || ERR "Missing required command: $1"
@@ -36,6 +37,7 @@ require sign_update
 require gh
 require zip
 require curl
+require python3
 
 [[ -z "${APP_STORE_CONNECT_API_KEY_P8:-}" || -z "${APP_STORE_CONNECT_KEY_ID:-}" || -z "${APP_STORE_CONNECT_ISSUER_ID:-}" ]] && \
   ERR "APP_STORE_CONNECT_* env vars must be set."
@@ -43,6 +45,42 @@ require curl
 [[ -f "$SPARKLE_PRIVATE_KEY_FILE" ]] || ERR "SPARKLE_PRIVATE_KEY_FILE not found at $SPARKLE_PRIVATE_KEY_FILE"
 
 git diff --quiet || ERR "Working tree is not clean."
+
+# Pre-flight: ensure changelog is finalized and release not already present
+./Scripts/validate_changelog.sh "$VERSION"
+
+get_appcast_head() {
+  python3 - <<'PY'
+import xml.etree.ElementTree as ET
+root = ET.parse('appcast.xml').getroot()
+channel = root.find('channel')
+first = channel.find('item') if channel is not None else None
+if first is None:
+    raise SystemExit('appcast.xml has no <item> entries')
+ns = {'sparkle': 'http://www.andymatuschak.org/xml-namespaces/sparkle'}
+ver = first.findtext('sparkle:shortVersionString', namespaces=ns)
+build = first.findtext('sparkle:version', namespaces=ns)
+print(ver or '')
+print(build or '')
+PY
+}
+read_appcast_head() {
+  mapfile -t APPCAST_HEAD < <(get_appcast_head)
+  APPCAST_TOP_VERSION=${APPCAST_HEAD[0]:-0.0.0}
+  APPCAST_TOP_BUILD=${APPCAST_HEAD[1]:-0}
+}
+
+read_appcast_head
+[[ "$APPCAST_TOP_VERSION" == "$VERSION" ]] && ERR "appcast already has version $VERSION; bump version first."
+if [[ "$BUILD" -le ${APPCAST_TOP_BUILD:-0} ]]; then
+  ERR "build number $BUILD must be greater than latest appcast build ${APPCAST_TOP_BUILD:-?}."
+fi
+
+# Quick Sparkle key sanity check
+tmp_sparkle=/tmp/trimmy-sparkle-probe.txt
+echo test > "$tmp_sparkle"
+sign_update --ed-key-file "$SPARKLE_PRIVATE_KEY_FILE" -p "$tmp_sparkle" >/dev/null
+rm -f "$tmp_sparkle"
 
 update_file_versions() {
   LOG "Bumping versions to $VERSION ($BUILD)"
@@ -115,6 +153,28 @@ sign_zip() {
   SIZE=$(stat -f%z "$ZIP_NAME")
 }
 
+extract_notes() {
+  LOG "Extracting release notes from CHANGELOG.md"
+  NOTES_PATH=$(mktemp /tmp/trimmy-notes-XXXX.md)
+  python3 - "$VERSION" "$NOTES_PATH" <<'PY' || ERR "Failed to extract notes"
+import sys, pathlib, re
+version = sys.argv[1]
+out = pathlib.Path(sys.argv[2])
+text = pathlib.Path("CHANGELOG.md").read_text()
+pattern = re.compile(rf"^##\s+{re.escape(version)}\s+—\s+.*$", re.M)
+m = pattern.search(text)
+if not m:
+    raise SystemExit("section not found")
+start = m.end()
+next_header = text.find("\n## ", start)
+chunk = text[start: next_header if next_header != -1 else len(text)]
+lines = [ln for ln in chunk.strip().splitlines() if ln.strip()]
+out.write_text("\n".join(lines) + "\n")
+print(out)
+PY
+  NOTES_FILE="$NOTES_PATH"
+}
+
 update_appcast() {
   LOG "Updating appcast.xml"
   local pubdate
@@ -143,6 +203,42 @@ path.write_text(xml[:insert_at] + entry + xml[insert_at:])
 PY
 }
 
+verify_local_artifacts() {
+  LOG "Verifying local artifacts in parallel"
+  (
+    sign_update --verify "$ZIP_NAME" "$SIGNATURE" >/dev/null && LOG "Signature verify ok"
+  ) &
+  p1=$!
+  (
+    spctl -a -t exec -vv "$APP_BUNDLE" >/dev/null && LOG "spctl ok"
+  ) &
+  p2=$!
+  (
+    codesign --verify --deep --strict --verbose "$APP_BUNDLE" >/dev/null && LOG "codesign ok"
+  ) &
+  p3=$!
+  local status=0
+  for pid in $p1 $p2 $p3; do
+    wait "$pid" || status=$?
+  done
+  [[ $status -eq 0 ]] || ERR "Local verification failed"
+}
+
+verify_remote_assets() {
+  LOG "Verifying uploaded assets (HEAD)"
+  (
+    curl -I -L "https://github.com/steipete/Trimmy/releases/download/v${VERSION}/Trimmy-${VERSION}.zip" | head -n 5
+  ) & p1=$!
+  (
+    curl -I -L "https://github.com/steipete/Trimmy/releases/download/v${VERSION}/Trimmy-${VERSION}.dSYM.zip" | head -n 5
+  ) & p2=$!
+  local status=0
+  for pid in $p1 $p2; do
+    wait "$pid" || status=$?
+  done
+  [[ $status -eq 0 ]] || ERR "Remote asset HEAD check failed"
+}
+
 create_tag_and_release() {
   LOG "Creating tag v$VERSION"
   git add CHANGELOG.md Scripts/package_app.sh Scripts/sign-and-notarize.sh appcast.xml
@@ -154,11 +250,14 @@ create_tag_and_release() {
 
   LOG "Uploading artifacts to GitHub release"
   local notes_arg=()
-  [[ -n "$NOTES_FILE" ]] && notes_arg=(--notes-file "$NOTES_FILE")
+  if [[ -n "$NOTES_FILE" ]]; then
+    notes_arg=(--notes-file "$NOTES_FILE")
+  else
+    ERR "Notes file missing after extraction"
+  fi
   gh release create "v$VERSION" "$ZIP_NAME" "$DSYM_ZIP" \
     --title "Trimmy $VERSION" \
-    --notes "Automated release $VERSION" \
-    "${notes_arg[@]:-}" --draft=false --verify-tag
+    "${notes_arg[@]}" --draft=false --verify-tag
 }
 
 verify_downloads() {
@@ -176,8 +275,12 @@ run_quality_gates
 build_and_notarize
 zip_dsym
 sign_zip
+verify_local_artifacts
+extract_notes
 update_appcast
 create_tag_and_release
+verify_remote_assets
+./Scripts/check-release-assets.sh "v$VERSION"
 verify_downloads
 
 LOG "Release $VERSION (build $BUILD) completed."
