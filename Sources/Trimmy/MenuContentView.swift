@@ -146,7 +146,8 @@ extension MenuContentView {
     }
 
     private var originalStatsSuffix: String {
-        self.statsSuffix(for: self.monitor.originalPreviewSource(), showTruncations: true)
+        // Show length for the original, but don’t report “trimmed” counts since it is the unmodified text.
+        self.statsSuffix(for: self.monitor.originalPreviewSource(), showTruncations: false)
     }
 
     private func statsSuffix(for text: String?, showTruncations: Bool) -> String {

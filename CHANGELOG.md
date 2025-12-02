@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.4.5 — Unreleased
-- Pending changes.
+- Paste Original row now shows only character count (no “trimmed” badge); trimmed badge remains on Paste Trimmed.
 
 ## 0.4.4 — 2025-12-01
 - Fixed a crash when opening Settings → Shortcuts by ensuring the KeyboardShortcuts resource bundle is packaged into Trimmy.app; packaging now fails if SwiftPM bundles are missing and a regression test guards bundle availability.
