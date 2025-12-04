@@ -193,7 +193,8 @@ final class ClipboardMonitor: ObservableObject {
 // MARK: - On-demand pasting
 
 extension ClipboardMonitor {
-    private static let accessibilityPermissionMessage = "Enable Accessibility to let Trimmy paste (System Settings → Privacy & Security → Accessibility)."
+    private static let accessibilityPermissionMessage = "Enable Accessibility to let Trimmy paste (System Settings "
+        + "→ Privacy & Security → Accessibility)."
 
     @discardableResult
     func pasteTrimmed() -> Bool {
